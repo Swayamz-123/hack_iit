@@ -22,6 +22,12 @@ const IncidentSchema = new mongoose.Schema(
       enum: ["unverified", "verified", "resolved"],
       default: "unverified",
     },
+    voters: {
+  type: [String], // anonymous device IDs
+  default: [],
+},
+
+
     upvotes: { type: Number, default: 0 },
     internalNotes: String,
   },

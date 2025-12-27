@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createIncident } from "../api/incident.api";
 import MapPreview from "./MapReview";
-
+import { getDeviceId } from "../utils/deviceId";
 export default function IncidentForm() {
   const navigate = useNavigate();
 
@@ -47,6 +47,7 @@ export default function IncidentForm() {
     await createIncident({
       ...form,
       location,
+      deviceId: getDeviceId(),
     });
 
     // 🔁 Redirect to feed after success
