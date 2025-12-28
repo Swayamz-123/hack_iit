@@ -11,8 +11,8 @@ router.post("/logout", adminAuth, (req, res) => {
 	// Clear cookie with matching options used at login
 	res.clearCookie("admin_token", {
 		httpOnly: true,
-		sameSite: "lax",
-		secure: false,
+		sameSite: "none",
+		secure: process.env.NODE_ENV==="production",
 	});
 	res.json({ success: true, message: "Logged out" });
 });
