@@ -3,6 +3,7 @@ import { fetchIncidents, upvoteIncident } from "../api/incident.api";
 import { socket } from "../socket/socket";
 import { useNavigate } from "react-router-dom";
 import IncidentForm from "../components/IncidentForm";
+import MapPreview from "../components/MapReview";
 import { getDeviceId } from "../utils/deviceId";
 import { distanceInMeters } from "../utils/geo";
 import { Activity } from "lucide-react";
@@ -10,6 +11,7 @@ import { Activity } from "lucide-react";
 export default function CitizenFeed() {
   const [incidents, setIncidents] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
+  const [selectedIncident, setSelectedIncident] = useState(null);
   const navigate = useNavigate();
 
   const load = async () => {
@@ -102,7 +104,7 @@ export default function CitizenFeed() {
               <IncidentForm />
             </div>
 
-            <div className="bg-[#E7E0E0] rounded-[2rem] p-6 border border-white/20">
+            <div className="bg-[#E7E0E0] rounded-4xl p-6 border border-white/20">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-[#423D47] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">!</div>
                 <h3 className="font-bold text-[#423D47]">Recent Alerts</h3>
@@ -143,7 +145,7 @@ export default function CitizenFeed() {
                   return (
                     <div key={incident._id} className="bg-white rounded-3xl p-5 shadow-sm border border-black/5">
                       <div className="flex gap-4">
-                        <div className="w-20 h-20 bg-[#F5F1EB] rounded-2xl flex-shrink-0 overflow-hidden flex items-center justify-center border border-black/5">
+                        <div className="w-20 h-20 bg-[#F5F1EB] rounded-2xl shrink-0 overflow-hidden flex items-center justify-center border border-black/5">
                           {incident.media?.[0] ? (
                             <img src={incident.media[0]} alt="Incident" className="w-full h-full object-cover" />
                           ) : (
@@ -152,9 +154,15 @@ export default function CitizenFeed() {
                         </div>
 
                         <div className="flex-1 min-w-0">
-                          <div className="flex justify-between items-start">
+                          <div className="flex justify-between items-start mb-2">
                             <h4 className="font-bold text-[#423D47] text-base capitalize truncate">{incident.type} Emergency</h4>
-                            <span className="text-lg font-black text-[#423D47]">{incident.upvotes || 0}</span>
+                            <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                              incident.status === 'verified' ? 'bg-emerald-500/20 text-emerald-700' :
+                              incident.status === 'resolved' ? 'bg-blue-500/20 text-blue-700' :
+                              'bg-yellow-500/20 text-yellow-700'
+                            }`}>
+                              {incident.status}
+                            </span>
                           </div>
                           <div className="flex items-center gap-2 text-[11px] font-bold text-[#8E8699] mt-1 mb-3">
                             <span>{getTimeAgo(incident.createdAt)} ago</span>
@@ -173,9 +181,12 @@ export default function CitizenFeed() {
                               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 15l7-7 7 7" />
                               </svg>
-                              {hasVoted ? 'Verified' : 'Upvote'}
+                              {hasVoted ? `✓ Voted (${incident.upvotes})` : `👍 Upvote (${incident.upvotes})`}
                             </button>
-                            <button className="bg-[#423D47] text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider">
+                            <button 
+                              onClick={() => setSelectedIncident(incident)}
+                              className="bg-[#423D47] text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-[#5A5266] transition-all"
+                            >
                               Details
                             </button>
                           </div>
@@ -188,6 +199,143 @@ export default function CitizenFeed() {
             </div>
           </div>
         </div>
+
+        {/* Modal Popup */}
+        {selectedIncident && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div className="bg-[#F5F1EB] rounded-[2.5rem] shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-black/5">
+              {/* Modal Header */}
+              <div className="sticky top-0 bg-[#F5F1EB] flex items-center justify-between p-6 border-b border-[#D9D1D1]">
+                <h2 className="text-2xl font-black text-[#423D47] capitalize">{selectedIncident.type} Emergency</h2>
+                <button
+                  onClick={() => setSelectedIncident(null)}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#EDE7E1] text-[#423D47] hover:bg-[#D9D1D1] transition-all text-xl font-bold"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Modal Content */}
+              <div className="p-8 space-y-6">
+                {/* Status Badge */}
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-bold text-[#8E8699] uppercase tracking-wider">Status:</span>
+                  <span className={`text-sm font-bold px-4 py-2 rounded-full ${
+                    selectedIncident.status === 'verified' ? 'bg-emerald-500/20 text-emerald-700' :
+                    selectedIncident.status === 'resolved' ? 'bg-blue-500/20 text-blue-700' :
+                    'bg-yellow-500/20 text-yellow-700'
+                  }`}>
+                    {selectedIncident.status.toUpperCase()}
+                  </span>
+                </div>
+
+                {/* Images Gallery */}
+                {selectedIncident.media && selectedIncident.media.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-bold text-[#5A5266] uppercase tracking-wider">Evidence</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      {selectedIncident.media.map((img, idx) => (
+                        <div key={idx} className="rounded-2xl overflow-hidden border border-black/5 shadow-sm">
+                          <img src={img} alt={`Evidence ${idx + 1}`} className="w-full h-48 object-cover cursor-pointer hover:opacity-90 transition-all" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Description */}
+                <div className="space-y-2">
+                  <h3 className="text-sm font-bold text-[#5A5266] uppercase tracking-wider">Description</h3>
+                  <p className="text-base text-[#423D47] leading-relaxed bg-[#EDE7E1] p-4 rounded-2xl">
+                    {selectedIncident.description}
+                  </p>
+                </div>
+
+                {/* Location */}
+                <div className="space-y-2">
+                  <h3 className="text-sm font-bold text-[#5A5266] uppercase tracking-wider">Location</h3>
+                  <div className="bg-[#EDE7E1] p-4 rounded-2xl">
+                    <p className="text-sm font-mono text-[#423D47]">
+                      📍 {selectedIncident.location?.lat?.toFixed(4)}, {selectedIncident.location?.lng?.toFixed(4)}
+                    </p>
+                    {userLocation && (
+                      <p className="text-xs text-[#8E8699] mt-2">
+                        Distance: {getDistance(selectedIncident)}
+                      </p>
+                    )}
+                  </div>
+                  {selectedIncident.location?.lat && selectedIncident.location?.lng && (
+                    <div className="rounded-2xl overflow-hidden border border-black/5 shadow-sm h-64">
+                      <MapPreview lat={selectedIncident.location.lat} lng={selectedIncident.location.lng} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Severity & Details */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <h3 className="text-xs font-bold text-[#5A5266] uppercase tracking-wider">Severity</h3>
+                    <div className="bg-[#EDE7E1] p-3 rounded-xl">
+                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+                        selectedIncident.severity === 'high' ? 'bg-red-500/20 text-red-700' :
+                        selectedIncident.severity === 'medium' ? 'bg-orange-500/20 text-orange-700' :
+                        'bg-yellow-500/20 text-yellow-700'
+                      }`}>
+                        {selectedIncident.severity.toUpperCase()}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-xs font-bold text-[#5A5266] uppercase tracking-wider">Upvotes</h3>
+                    <div className="bg-emerald-500/10 p-3 rounded-xl">
+                      <p className="text-2xl font-black text-emerald-700">👍 {selectedIncident.upvotes}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Timestamp */}
+                <div className="bg-[#E7E0E0] p-4 rounded-2xl">
+                  <p className="text-xs text-[#8E8699] font-bold">
+                    📅 Reported {getTimeAgo(selectedIncident.createdAt)} ago
+                  </p>
+                  <p className="text-xs text-[#8E8699] font-bold mt-1">
+                    {new Date(selectedIncident.createdAt).toLocaleString()}
+                  </p>
+                </div>
+
+                {/* Upvote Button */}
+                <div className="pt-4 border-t border-[#D9D1D1]">
+                  {!Array.isArray(selectedIncident.voters) || !selectedIncident.voters.includes(getDeviceId()) ? (
+                    <button
+                      onClick={async () => {
+                        await handleUpvote(selectedIncident._id, getDeviceId());
+                        setSelectedIncident(null);
+                      }}
+                      className="w-full bg-[#7DA99C] hover:bg-[#6A9488] text-white py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all shadow-md"
+                    >
+                      👍 Upvote This Incident
+                    </button>
+                  ) : (
+                    <button
+                      disabled
+                      className="w-full bg-[#7DA99C]/20 text-[#7DA99C] py-4 rounded-2xl font-black text-sm uppercase tracking-wider cursor-not-allowed opacity-60"
+                    >
+                      ✓ Already Upvoted
+                    </button>
+                  )}
+                </div>
+
+                {/* Close Button */}
+                <button
+                  onClick={() => setSelectedIncident(null)}
+                  className="w-full bg-[#EDE7E1] hover:bg-[#D9D1D1] text-[#423D47] py-3 rounded-2xl font-bold text-sm uppercase tracking-wider transition-all"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
