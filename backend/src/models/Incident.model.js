@@ -29,6 +29,7 @@ const IncidentSchema = new mongoose.Schema(
 
 
     upvotes: { type: Number, default: 0 },
+    media: { type: [String], default: [] },
     internalNotes: String,
   },
   { timestamps: true }

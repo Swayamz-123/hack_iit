@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createIncident } from "../api/incident.api";
+import { createIncident, uploadMedia } from "../api/incident.api";
 import MapPreview from "./MapReview";
 import { getDeviceId } from "../utils/deviceId";
 
@@ -15,6 +15,9 @@ export default function IncidentForm() {
 
   const [location, setLocation] = useState(null);
   const [loadingLocation, setLoadingLocation] = useState(true);
+  const [mediaFile, setMediaFile] = useState(null);
+  const [mediaPreview, setMediaPreview] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -37,6 +40,16 @@ export default function IncidentForm() {
     );
   }, []);
 
+  const handleMediaChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setMediaFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setMediaPreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
   const submit = async (e) => {
     e.preventDefault();
 
@@ -45,14 +58,32 @@ export default function IncidentForm() {
       return;
     }
 
-    await createIncident({
-      ...form,
-      location,
-      deviceId: getDeviceId(),
-    });
+    setUploading(true);
+    try {
+      const mediaUrls = [];
+      
+      // Upload media if present
+      if (mediaFile) {
+        const uploadRes = await uploadMedia(mediaFile);
+        if (uploadRes.data.success) {
+          mediaUrls.push(uploadRes.data.url);
+        }
+      }
 
-    // 🔁 Redirect to feed after success
-    navigate("/");
+      await createIncident({
+        ...form,
+        location,
+        deviceId: getDeviceId(),
+        media: mediaUrls,
+      });
+
+      // 🔁 Redirect to feed after success
+      navigate("/");
+    } catch (error) {
+      alert("Failed to submit incident: " + error.message);
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -114,6 +145,28 @@ export default function IncidentForm() {
         </select>
       </label>
 
+      {/* Media Upload */}
+      <label className="block mb-8">
+        <span className="block text-base font-bold text-amber-300 mb-3 tracking-wide">
+          Photo Evidence (Optional)
+        </span>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleMediaChange}
+          className="block w-full text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-violet-500 file:text-white hover:file:bg-violet-600 cursor-pointer bg-slate-900/60 border border-slate-700 rounded-xl"
+        />
+        {mediaPreview && (
+          <div className="mt-4 rounded-xl overflow-hidden border border-slate-700">
+            <img
+              src={mediaPreview}
+              alt="Preview"
+              className="w-full h-48 object-cover"
+            />
+          </div>
+        )}
+      </label>
+
       {/* Location */}
       {loadingLocation && (
         <div className="mb-6 p-6 bg-slate-800/50 rounded-2xl border-2 border-yellow-500/30 text-center">
@@ -140,10 +193,10 @@ export default function IncidentForm() {
 
       <button
         type="submit"
-        disabled={!location}
+        disabled={!location || uploading}
         className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white py-4 rounded-2xl font-black text-lg shadow-2xl hover:from-red-600 hover:to-orange-600 hover:shadow-3xl transform hover:scale-[1.02] transition-all duration-300 active:scale-[0.98] border-2 border-red-400/50 backdrop-blur-sm disabled:from-slate-700/50 disabled:to-slate-800/50 disabled:shadow-none disabled:cursor-not-allowed disabled:scale-100 disabled:transform-none"
       >
-        🚨 Submit Incident Report
+        {uploading ? "📤 Uploading..." : "🚨 Submit Incident Report"}
       </button>
     </form>
   );

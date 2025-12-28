@@ -61,7 +61,24 @@ export async function list(req, res)
      emitEvent("incident:update", updated); 
      res.json({ success: true, data: updated }); 
     }
-     export async function updateStatus(req, res) {
-       const updated = await service.updateStatus( req.body.incidentId, req.body.status, req.body.internalNotes );
-        emitEvent("incident:update", updated); res.json({ success: true, data: updated });
-       }   
+export async function updateStatus(req, res) {
+  const updated = await service.updateStatus(
+    req.body.incidentId,
+    req.body.status,
+    req.body.internalNotes
+  );
+  emitEvent("incident:update", updated);
+  res.json({ success: true, data: updated });
+}
+
+export async function uploadMedia(req, res) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+    }
+    // Cloudinary URL is in req.file.path
+    res.json({ success: true, url: req.file.path });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}   

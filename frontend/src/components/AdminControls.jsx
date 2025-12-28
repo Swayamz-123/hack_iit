@@ -1,4 +1,4 @@
-import { verifyIncident,updateIncidentStatus } from "../api/incident.api";
+import { verifyIncident, updateIncidentStatus } from "../api/incident.api";
 
 export default function AdminControls({ refresh }) {
   const verify = async (id) => {
@@ -14,5 +14,14 @@ export default function AdminControls({ refresh }) {
     refresh();
   };
 
-  return { verify, resolve };
+  const saveNotes = async (id, internalNotes, status) => {
+    await updateIncidentStatus({
+      incidentId: id,
+      status,
+      internalNotes,
+    });
+    refresh();
+  };
+
+  return { verify, resolve, saveNotes };
 }

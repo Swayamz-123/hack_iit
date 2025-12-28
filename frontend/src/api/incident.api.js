@@ -7,3 +7,12 @@ export const verifyIncident = (incidentId) =>
 export const updateIncidentStatus = (payload) =>
   api.post("/incidents/status", payload);
 export const adminLogin = (data) => api.post("/admin/login", data);
+export const checkAdmin = () => api.get("/admin/me");
+export const logoutAdmin = () => api.post("/admin/logout");
+export const uploadMedia = (file) => {
+  const formData = new FormData();
+  formData.append("media", file);
+  return api.post("/incidents/upload", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
