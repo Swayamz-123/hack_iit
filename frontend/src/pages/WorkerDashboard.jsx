@@ -56,38 +56,72 @@ export default function WorkerDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-800">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <header className="mb-8 flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-black bg-linear-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-              Responder Dashboard
-            </h2>
-            {me && (
-              <p className="text-xs text-slate-400 mt-2 font-medium">
-                🚔 {me.name} • {me.type.toUpperCase()}
-              </p>
-            )}
+    <div className="min-h-screen bg-[#D1C4D1] flex items-center justify-center p-4 sm:p-8 font-sans antialiased">
+      <div className="max-w-6xl w-full bg-[#F2EDE9] rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden border-[12] border-white/40">
+        <div className="p-8 md:p-16">
+          <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-[#7DA99C] rounded-2xl flex items-center justify-center shadow-sm">
+                  <div className="w-5 h-5 border-2 border-white rounded-sm rotate-45"></div>
+                </div>
+                <span className="text-[#5A5266] font-black text-2xl tracking-tighter uppercase">Em-Grid</span>
+              </div>
+              <h1 className="text-3xl md:text-4xl font-black text-[#4A4453] tracking-[ -0.02em] leading-none">
+                Responder <span className="opacity-40 italic font-medium">Dashboard</span>
+              </h1>
+              {me && (
+                <p className="text-sm text-[#8E8699] mt-2 font-medium">
+                  🚔 {me.name} • {me.type.toUpperCase()}
+                </p>
+              )}
+            </div>
+
+            <div className="hidden md:flex flex-col items-end gap-3">
+              <div className="text-[#9A8FAB] text-xs font-bold uppercase tracking-widest">Status</div>
+              <div className="flex items-center gap-2 text-[#7DA99C] font-bold">
+                <span className="w-2 h-2 bg-[#7DA99C] rounded-full animate-pulse"></span>
+                System Operational
+              </div>
+              <button
+                onClick={handleLogout}
+                className="mt-4 px-4 py-2 rounded-lg text-xs font-bold bg-white text-[#5A5266] border border-white/40 shadow-sm hover:shadow-md transition"
+              >
+                Logout
+              </button>
+            </div>
+          </header>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="col-span-1">
+              <div className="group relative bg-white/60 p-1 rounded-[2.5rem] transition-all hover:bg-white shadow-lg">
+                <div className="p-6 rounded-[2.3rem]">
+                  <h3 className="text-xl font-black text-[#4A4453] mb-2">Your Status</h3>
+                  <p className="text-sm text-[#8E8699]">Connected as responder. Check assignments and update statuses.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-span-2">
+              <div className="group relative bg-white/60 p-1 rounded-[2.5rem] transition-all hover:bg-white shadow-lg">
+                <div className="p-6 rounded-[2.3rem]">
+                  {incidents.length === 0 ? (
+                    <div className="rounded-lg border border-[#E6E0DF] bg-white/50 p-8 text-center">
+                      <p className="text-sm font-semibold text-[#4A4453]">✓ All caught up!</p>
+                      <p className="text-xs text-[#8E8699] mt-2">No new assignments at this time</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {incidents.map((i) => (
+                        <IncidentCard key={i._id} incident={i} responder onStatusUpdate={handleStatusUpdate} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 rounded-lg text-xs font-bold bg-slate-700/80 hover:bg-slate-600/80 text-slate-200 border border-slate-600/50 transition"
-          >
-            Logout
-          </button>
-        </header>
-        {incidents.length === 0 ? (
-          <div className="rounded-lg border border-slate-700/50 bg-slate-800/60 p-8 text-center">
-            <p className="text-sm font-semibold text-slate-300">✓ All caught up!</p>
-            <p className="text-xs text-slate-500 mt-2">No new assignments at this time</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {incidents.map((i) => (
-              <IncidentCard key={i._id} incident={i} responder onStatusUpdate={handleStatusUpdate} />
-            ))}
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { createIncident, uploadMedia } from "../api/incident.api";
 import MapPreview from "./MapReview";
 import { getDeviceId } from "../utils/deviceId";
-import { Upload } from "lucide-react";
 
 export default function IncidentForm() {
   const navigate = useNavigate();
