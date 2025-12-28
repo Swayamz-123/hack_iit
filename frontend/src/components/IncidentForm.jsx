@@ -90,24 +90,24 @@ export default function IncidentForm() {
   return (
     <form
       onSubmit={submit}
-      className="bg-linear-to-br from-slate-900/95 to-indigo-900/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 mb-8 border border-l-4 border-red-500/80 max-w-2xl mx-auto"
+      className="bg-[#C5ABD1] rounded-2xl shadow-2xl p-8 mb-6 border border-[#B89BC5]"
     >
       {successMsg && (
-        <div className="mb-4 rounded-lg border border-emerald-600/40 bg-emerald-900/30 px-4 py-3 text-sm text-emerald-200 font-semibold">
+        <div className="mb-4 rounded-lg border border-emerald-600/40 bg-emerald-900/30 px-4 py-3 text-xs text-emerald-200 font-semibold">
           {successMsg}
         </div>
       )}
-      <h3 className="text-2xl font-black capitalize bg-linear-to-r from-red-400 to-orange-400 bg-clip-text text-transparent mb-8 text-center drop-shadow-2xl">
+      <h3 className="text-base font-bold capitalize text-[#5a4a6a] mb-6 text-center">
         Report Incident
       </h3>
 
       {/* Incident Type */}
       <label className="block mb-6">
-        <span className="block text-sm font-bold text-slate-300 mb-3">
+        <span className="block text-xs font-bold text-[#5a4a6a] mb-3">
           Incident Type
         </span>
         <select
-          className="w-full px-4 py-2.5 rounded-lg border border-slate-700/60 bg-slate-900/60 text-sm font-semibold text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400/50 transition"
+          className="w-full px-4 py-2.5 rounded-lg border border-stone-300 bg-[#f5efe9] text-xs font-semibold text-[#5a4a6a] focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 transition"
           value={form.type}
           onChange={(e) => setForm({ ...form, type: e.target.value })}
         >
@@ -120,7 +120,7 @@ export default function IncidentForm() {
 
       {/* Description */}
       <label className="block mb-6">
-        <span className="block text-sm font-bold text-slate-300 mb-3">
+        <span className="block text-xs font-bold text-[#5a4a6a] mb-3">
           Description
         </span>
         <textarea
@@ -129,18 +129,18 @@ export default function IncidentForm() {
           onChange={(e) =>
             setForm({ ...form, description: e.target.value })
           }
-          className="w-full rounded-lg border border-slate-700/60 px-4 py-3 text-sm resize-none bg-slate-900/60 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400/50 transition"
+          className="w-full rounded-lg border border-stone-300 px-4 py-3 text-xs resize-none bg-[#f5efe9] text-[#5a4a6a] placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 transition"
           rows={5}
         />
       </label>
 
       {/* Severity */}
       <label className="block mb-6">
-        <span className="block text-sm font-bold text-slate-300 mb-3">
+        <span className="block text-xs font-bold text-[#5a4a6a] mb-3">
           Severity
         </span>
         <select
-          className="w-full px-4 py-2.5 rounded-lg border border-slate-700/60 bg-slate-900/60 text-sm font-semibold text-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-400/50 transition"
+          className="w-full px-4 py-2.5 rounded-lg border border-stone-300 bg-[#f5efe9] text-xs font-semibold text-[#5a4a6a] focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 transition"
           value={form.severity}
           onChange={(e) =>
             setForm({ ...form, severity: e.target.value })
@@ -154,17 +154,17 @@ export default function IncidentForm() {
 
       {/* Media Upload */}
       <label className="block mb-6">
-        <span className="block text-sm font-bold text-slate-300 mb-3">
+        <span className="block text-xs font-bold text-[#5a4a6a] mb-3">
           Photo Evidence (Optional)
         </span>
         <input
           type="file"
           accept="image/*"
           onChange={handleMediaChange}
-          className="block w-full text-sm text-slate-300 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer bg-slate-900/60 border border-slate-700/60 rounded-lg"
+          className="block w-full text-xs text-[#5a4a6a] file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-teal-500 file:text-white hover:file:bg-teal-600 cursor-pointer bg-[#f5efe9] border border-stone-300 rounded-lg"
         />
         {mediaPreview && (
-          <div className="mt-4 rounded-lg overflow-hidden border border-slate-700/50 shadow-md">
+          <div className="mt-4 rounded-lg overflow-hidden border border-stone-300 shadow-md">
             <img
               src={mediaPreview}
               alt="Preview"
@@ -176,8 +176,8 @@ export default function IncidentForm() {
 
       {/* Location */}
       {loadingLocation && (
-        <div className="mb-6 p-4 bg-slate-800/60 rounded-lg border border-slate-700/50 text-center">
-          <p className="text-sm text-slate-300 font-semibold animate-pulse">
+        <div className="mb-6 p-4 bg-[#f5efe9] rounded-lg border border-stone-300 text-center">
+          <p className="text-xs text-[#5a4a6a] font-semibold animate-pulse">
             📡 Detecting location...
           </p>
         </div>
@@ -185,11 +185,11 @@ export default function IncidentForm() {
 
       {location && (
         <div className="mb-6">
-          <p className="text-xs text-slate-400 mb-3 font-semibold">
-            📍 <span className="text-slate-300 font-mono bg-slate-800/60 px-2.5 py-1 rounded">{location.lat.toFixed(4)}, {location.lng.toFixed(4)}</span>
+          <p className="text-xs text-[#5a4a6a] mb-3 font-semibold">
+            📍 <span className="text-[#5a4a6a] font-mono bg-[#f5efe9] px-2.5 py-1 rounded border border-stone-300">{location.lat.toFixed(4)}, {location.lng.toFixed(4)}</span>
           </p>
 
-          <div className="rounded-lg overflow-hidden border border-slate-700/50 shadow-lg bg-slate-900/40">
+          <div className="rounded-lg overflow-hidden border border-stone-300 shadow-lg bg-[#f5efe9]">
             <MapPreview lat={location.lat} lng={location.lng} />
           </div>
         </div>
@@ -198,7 +198,7 @@ export default function IncidentForm() {
       <button
         type="submit"
         disabled={!location || uploading}
-        className="w-full bg-linear-to-r from-red-600 to-orange-600 text-white py-3 rounded-lg font-bold text-sm shadow-lg hover:from-red-700 hover:to-orange-700 hover:shadow-xl transform hover:scale-[1.01] transition-all duration-200 active:scale-[0.99] border border-red-500/30 disabled:from-slate-700/60 disabled:to-slate-800/60 disabled:shadow-none disabled:cursor-not-allowed disabled:scale-100"
+        className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white py-3 rounded-lg font-bold text-xs shadow-lg hover:shadow-xl transform hover:scale-[1.01] transition-all duration-200 active:scale-[0.99] border border-teal-500/30 disabled:from-stone-300 disabled:to-stone-400 disabled:text-stone-500 disabled:shadow-none disabled:cursor-not-allowed disabled:scale-100"
       >
         {uploading ? "📤 Uploading..." : "🚨 Report Incident"}
       </button>
