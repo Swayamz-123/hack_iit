@@ -1,4 +1,4 @@
-# 🚨 EmergencyHub – Real-Time Emergency Incident Reporting & Response System
+# EM-GRID – Real-Time Emergency Incident Reporting & Response System
 
 > A **full-stack, production-ready** emergency incident reporting platform that connects citizens, administrators, and emergency responders in real-time. Built with a focus on speed, deduplication, and live coordination.
 
@@ -9,7 +9,7 @@
 
 ## 🎯 Overview
 
-**EmergencyHub** is a comprehensive emergency management system designed for hackathons and real-world deployment. Citizens report emergencies with geolocation and media; the system deduplicates incidents intelligently, administrators verify and assign responders, and responders track assignments in real-time via socket.io.
+**EM-GRID** is a comprehensive emergency management system designed for hackathons and real-world deployment. Citizens report emergencies with geolocation and media; the system deduplicates incidents intelligently, administrators verify and assign responders, and responders track assignments in real-time via socket.io.
 
 **Key Innovation**: Smart incident deduplication via **time window + geolocation radius** prevents duplicate reports from overwhelming the system, while **per-device upvoting** lets citizens validate critical incidents without flooding the feed.
 
@@ -267,6 +267,9 @@ npm run dev
 - Real-time updates via Socket.io
 - Automatic incident merging when duplicates detected
 - Responder assignment visibility for transparency
+### **5. Feed shown within 15kms and upvote within 2kms**
+- All incidents will be shown under 15km range
+- Upvotes will be done under 2km range 
 
 ### **6. Production-Ready Stack**
 - **Scalable**: MongoDB for flexible schema, Socket.io for concurrent users
@@ -400,12 +403,6 @@ This project was built during a hackathon. For improvements, submit issues or PR
 
 ---
 
-## 📝 License
-
-MIT License – Free to use and modify.
-
----
-
 ## 🙏 Acknowledgments
 
 Built with ❤️ during **IITJ Hackathon** 2024. Thanks to the judges, mentors, and community for the opportunity to solve real-world problems.
@@ -416,6 +413,4 @@ Built with ❤️ during **IITJ Hackathon** 2024. Thanks to the judges, mentors,
 
 For questions or feedback, reach out to the development team.
 
----
 
-**Ready to deploy? Start with the [Getting Started](#-getting-started) section above!** 🚀
