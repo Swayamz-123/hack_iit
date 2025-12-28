@@ -125,7 +125,7 @@ export default function IncidentForm() {
           placeholder="Detailed situation description..."
           value={form.description}
           onChange={(e) => setForm({ ...form, description: e.target.value })}
-          className="w-full rounded-[1.5rem] border-none px-5 py-4 text-sm bg-white/50 text-[#5A5266] placeholder-[#8E8699]/60 focus:ring-2 focus:ring-[#7DA99C]/40 min-h-[120px] resize-none shadow-inner"
+          className="w-full rounded-3xl border-none px-5 py-4 text-sm bg-white/50 text-[#5A5266] placeholder-[#8E8699]/60 focus:ring-2 focus:ring-[#7DA99C]/40 min-h-30 resize-none shadow-inner"
         />
       </div>
 
@@ -168,7 +168,7 @@ export default function IncidentForm() {
       <button
         type="submit"
         disabled={!location || uploading}
-        className="w-full bg-[#7DA99C] hover:bg-[#6A9488] text-white py-5 rounded-[1.5rem] font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-[#7DA99C]/30 transition-all active:scale-[0.98] disabled:opacity-50"
+        className="w-full bg-[#7DA99C] hover:bg-[#6A9488] text-white py-5 rounded-3xl font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-[#7DA99C]/30 transition-all active:scale-[0.98] disabled:opacity-50"
       >
         {uploading ? "Transmitting..." : "Submit Protocol"}
       </button>
