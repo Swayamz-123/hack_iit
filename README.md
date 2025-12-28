@@ -193,42 +193,6 @@ npm run dev
 
 ---
 
-## 🌐 Deployment
-
-### **Frontend Deployment (Vercel)**
-1. Push code to GitHub
-2. Go to [Vercel](https://vercel.com) → New Project
-3. Import repo, set root to `frontend/`, framework to Vite
-4. Add environment variables:
-   - `VITE_API_BASE`: Your Render backend URL
-   - `VITE_SOCKET_URL`: Your Render backend URL
-5. Add **Rewrites** in Settings → Routes:
-   - Source: `/(.*)`
-   - Destination: `/index.html` (for SPA routing)
-6. Deploy
-
-### **Backend Deployment (Render)**
-1. Go to [Render](https://render.com) → New Web Service
-2. Connect GitHub repo, set root to `backend/`
-3. Set start command: `npm start`
-4. Set Node version: 20
-5. Add environment variables:
-   ```
-   MONGODB_URI=<your-mongoDB-atlas-uri>
-   JWT_SECRET=<generate-secure-key>
-   ADMIN_EMAIL=admin@gmail.com
-   ADMIN_PASSWORD=admin123
-   CLOUDINARY_CLOUD_NAME=<your-cloud-name>
-   CLOUDINARY_API_KEY=<your-api-key>
-   CLOUDINARY_API_SECRET=<your-api-secret>
-   RESPONDER_REG_TOKEN=<secure-token>
-   CORS_ORIGIN=https://your-frontend.vercel.app
-   NODE_ENV=production
-   ```
-6. Deploy and monitor logs
-
----
-
 ## 🔐 Security Features
 
 - **JWT Authentication**: Stateless, httpOnly cookies for XSS protection
