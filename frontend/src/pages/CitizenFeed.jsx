@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import IncidentForm from "../components/IncidentForm";
 import { getDeviceId } from "../utils/deviceId";
 import { distanceInMeters } from "../utils/geo";
+import { Activity } from "lucide-react";
 
 export default function CitizenFeed() {
   const [incidents, setIncidents] = useState([]);
@@ -21,7 +22,6 @@ export default function CitizenFeed() {
     socket.on("incident:new", load);
     socket.on("incident:update", load);
     
-    // Get user location for distance calculation
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
@@ -47,7 +47,7 @@ export default function CitizenFeed() {
   const handleUpvote = async (incidentId, deviceId) => {
     try {
       await upvoteIncident(incidentId, deviceId);
-      load(); // Reload to get updated upvote count
+      load();
     } catch (e) {
       console.error("Upvote failed", e);
     }
@@ -79,182 +79,113 @@ export default function CitizenFeed() {
   };
 
   return (
-    <div className="min-h-screen bg-[#D1BADB] p-8">
-      <div className="h-[calc(100vh-4rem)] max-w-[85%] mx-auto bg-gradient-to-br from-stone-100 to-stone-200 rounded-2xl shadow-xl overflow-hidden flex">
-        {/* Left Sidebar - 15% */}
-        <div className="w-[15%] bg-stone-50 flex flex-col border-r border-stone-300/50">
-          {/* Logo */}
-          <div className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="relative w-8 h-8 flex items-center justify-center">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12 2L12 22M2 12L22 12"
-                    stroke="#10b981"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                  />
-                </svg>
+    <div className="min-h-screen bg-[#F5F1EB] font-sans text-[#423D47]" style={{ fontFamily: '"Inter", "Segoe UI", Roboto, sans-serif' }}>
+      <div className="max-w-7xl mx-auto p-4 md:p-10">
+        
+        {/* Simplified Branding Header */}
+        <header className="mb-12 flex items-center gap-4 border-b border-[#D9D1D1] pb-8">
+          <div className="w-12 h-12 bg-[#7DA99C] rounded-2xl flex items-center justify-center text-white shadow-sm">
+            <Activity size={28} />
+          </div>
+          <div>
+            <h1 className="text-2xl font-black uppercase tracking-tighter leading-none">Em-Grid</h1>
+            <p className="text-[10px] font-bold text-[#8E8699] uppercase tracking-[0.2em] mt-1">Emergency Protocol System</p>
+          </div>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Left Column - 60% */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="bg-[#D9D1D1] rounded-[2.5rem] p-8 shadow-sm border border-black/5">
+              <h2 className="text-xl font-bold text-[#5A5266] mb-6 tracking-tight">Report an Incident</h2>
+              <IncidentForm />
+            </div>
+
+            <div className="bg-[#E7E0E0] rounded-[2rem] p-6 border border-white/20">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="bg-[#423D47] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">!</div>
+                <h3 className="font-bold text-[#423D47]">Recent Alerts</h3>
               </div>
-              <h1 className="text-lg font-bold text-gray-800">Em-Grid</h1>
+              <p className="text-sm text-[#5A5266] leading-relaxed">
+                Stay alert for emergencies nearby. Verification from citizens helps responders prioritize the most critical cases.
+              </p>
             </div>
           </div>
 
-          {/* Logout Button */}
-          <div className="mt-auto p-6">
-            <button
-              onClick={() => navigate("/")}
-              className="w-full flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium py-2 px-4 rounded-lg hover:bg-stone-100 transition-colors"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Log out
-            </button>
-          </div>
-        </div>
+          {/* Right Column - 40% */}
+          <div className="lg:col-span-5 bg-white/40 rounded-[2.5rem] p-6 md:p-8 backdrop-blur-sm border border-white/60">
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold text-[#423D47] mb-1 tracking-tight">Local Incidents & Verification</h3>
+              <p className="text-sm text-[#8E8699] font-medium italic">Recent activity within 1km radius</p>
+            </div>
 
-        {/* Middle Section - Form - 55% */}
-        <div className="flex-[55] overflow-y-auto bg-stone-50 p-8">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-4xl font-bold text-gray-800 mb-8 text-center">
-              Connecting emergencies to care.
-            </h2>
-            <IncidentForm />
-          </div>
-        </div>
-
-
-        {/* Right Section - Recent Incidents - 30% */}
-        <div className="w-[30%] bg-stone-100 border-l border-stone-300/50 overflow-y-auto p-6">
-          <div className="mb-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-2">
-              Local Incidents & Verification
-            </h3>
-            <p className="text-sm text-gray-600">
-              Recent accidents within 1km radius
-            </p>
-          </div>
-
-          {/* Search Bar */}
-          <div className="mb-6 relative">
-            <input
-              type="text"
-              placeholder="Search incidents..."
-              className="w-full px-4 py-2 pl-10 rounded-lg border border-stone-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 text-gray-700"
-            />
-            <svg
-              className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            <div className="mb-8 relative">
+              <input
+                type="text"
+                placeholder="Search grid..."
+                className="w-full bg-[#EDE7E1] border-none rounded-2xl py-4 pl-12 pr-4 text-sm focus:ring-2 focus:ring-[#7DA99C]/50 text-[#423D47] placeholder-[#8E8699]"
               />
-            </svg>
-          </div>
+              <svg className="absolute left-4 top-3.5 h-5 w-5 text-[#8E8699]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
 
-          {/* Incident Cards */}
-          <div className="space-y-4">
-            {activeIncidents.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <p className="text-sm">No active incidents</p>
-              </div>
-            ) : (
-              activeIncidents.map((incident) => {
-                const deviceId = getDeviceId();
-                const hasVoted = Array.isArray(incident.voters) && incident.voters.includes(deviceId);
-                const distance = getDistance(incident);
-                const timeAgo = getTimeAgo(incident.createdAt);
-
-                return (
-                  <div
-                    key={incident._id}
-                    className="bg-white rounded-lg border border-stone-200 p-4 shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex gap-4">
-                      {/* Image */}
-                      <div className="w-20 h-20 bg-stone-200 rounded-lg flex-shrink-0 overflow-hidden">
-                        {incident.media && incident.media.length > 0 ? (
-                          <img
-                            src={incident.media[0]}
-                            alt="Incident"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                            No Image
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-gray-800 text-sm mb-1 capitalize">
-                          {incident.type} Emergency
-                        </h4>
-                        <p className="text-xs text-gray-600 mb-2 line-clamp-2">
-                          {incident.description}
-                        </p>
-                        <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
-                          {timeAgo && <span>{timeAgo} ago</span>}
-                          {distance && (
-                            <>
-                              <span>•</span>
-                              <span>{distance}</span>
-                            </>
+            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+              {activeIncidents.length === 0 ? (
+                <div className="text-center py-20 text-[#8E8699]">
+                  <p className="font-bold uppercase tracking-widest text-xs opacity-50">No active reports</p>
+                </div>
+              ) : (
+                activeIncidents.map((incident) => {
+                  const deviceId = getDeviceId();
+                  const hasVoted = Array.isArray(incident.voters) && incident.voters.includes(deviceId);
+                  return (
+                    <div key={incident._id} className="bg-white rounded-3xl p-5 shadow-sm border border-black/5">
+                      <div className="flex gap-4">
+                        <div className="w-20 h-20 bg-[#F5F1EB] rounded-2xl flex-shrink-0 overflow-hidden flex items-center justify-center border border-black/5">
+                          {incident.media?.[0] ? (
+                            <img src={incident.media[0]} alt="Incident" className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="text-[10px] font-bold text-[#8E8699] opacity-40 uppercase">No Media</span>
                           )}
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-lg font-bold text-gray-800">
-                            {incident.upvotes || 0}
-                          </span>
-                          <button
-                            onClick={() => !hasVoted && handleUpvote(incident._id, deviceId)}
-                            disabled={hasVoted}
-                            className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-                          >
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-start">
+                            <h4 className="font-bold text-[#423D47] text-base capitalize truncate">{incident.type} Emergency</h4>
+                            <span className="text-lg font-black text-[#423D47]">{incident.upvotes || 0}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[11px] font-bold text-[#8E8699] mt-1 mb-3">
+                            <span>{getTimeAgo(incident.createdAt)} ago</span>
+                            <span className="opacity-30">|</span>
+                            <span>{getDistance(incident)}</span>
+                          </div>
+                          
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => !hasVoted && handleUpvote(incident._id, deviceId)}
+                              disabled={hasVoted}
+                              className={`flex-1 flex items-center justify-center gap-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
+                                hasVoted ? 'bg-[#7DA99C]/20 text-[#7DA99C]' : 'bg-[#EDE7E1] text-[#423D47]'
+                              }`}
                             >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M5 15l7-7 7 7"
-                              />
-                            </svg>
-                            Upvote
-                          </button>
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 15l7-7 7 7" />
+                              </svg>
+                              {hasVoted ? 'Verified' : 'Upvote'}
+                            </button>
+                            <button className="bg-[#423D47] text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider">
+                              Details
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })
-            )}
+                  );
+                })
+              )}
+            </div>
           </div>
         </div>
       </div>
