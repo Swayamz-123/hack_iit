@@ -25,8 +25,8 @@ router.post("/register", async (req, res) => {
   const authToken = signResponderToken(responder._id.toString());
   res.cookie("responder_token", authToken, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: false,
+    sameSite: "none",
+    secure: process.env.NODE_ENV==="production",
     maxAge: 24 * 60 * 60 * 1000,
   });
 
@@ -71,8 +71,8 @@ router.get("/me", responderAuth, async (req, res) => {
 router.post("/logout", responderAuth, (req, res) => {
   res.clearCookie("responder_token", {
     httpOnly: true,
-    sameSite: "lax",
-    secure: false,
+    sameSite: "none",
+    secure: process.env.NODE_ENV==="production",
   });
   res.json({ success: true, message: "Responder logged out" });
 });

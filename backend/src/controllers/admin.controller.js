@@ -15,8 +15,8 @@ export function loginAdmin(req, res) {
   // 🍪 SET COOKIE (THIS WAS MISSING)
   res.cookie("admin_token", token, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: false, // true only in production HTTPS
+    sameSite: "none",
+    secure: process.env.NODE_ENV==="production", // true only in production HTTPS
     maxAge: 12 * 60 * 60 * 1000, // 12 hours
   });
 
