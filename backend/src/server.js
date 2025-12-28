@@ -11,6 +11,7 @@ const server = http.createServer(app);
 connectDB();
 initSocket(server);
 
-server.listen(process.env.PORT, () => {
-  console.log(`🚀 Backend running on port ${process.env.PORT}`);
+const PORT = process.env.PORT || 8000;
+server.listen(PORT, () => {
+  console.log(`🚀 Backend running on port ${PORT}`);
 });
