@@ -90,7 +90,7 @@ export default function IncidentCard({ incident, admin, responder, onVerify, onR
               <button
                 onClick={handleUpvote}
                 disabled={hasVoted || upvoteLoading}
-                className="px-3 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-emerald-600 to-teal-700 text-white border border-emerald-500/30 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="px-3 py-1.5 rounded-lg text-xs font-bold bg-linear-to-r from-emerald-600 to-teal-700 text-white border border-emerald-500/30 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {hasVoted ? "Voted" : upvoteLoading ? "..." : "Upvote"}
               </button>
