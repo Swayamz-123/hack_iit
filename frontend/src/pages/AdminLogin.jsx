@@ -1,10 +1,28 @@
-import { useState } from "react";
-import { adminLogin } from "../api/incident.api";
+import { useState, useEffect } from "react";
+import { adminLogin, checkAdmin } from "../api/incident.api";
 import { useNavigate } from "react-router-dom";
 
 export default function AdminLogin() {
   const [form, setForm] = useState({});
+  const [loading, setLoading] = useState(true);
   const nav = useNavigate();
+
+  useEffect(() => {
+    // Check if already logged in
+    const checkSession = async () => {
+      try {
+        await checkAdmin();
+        // If no error, user is logged in
+        nav("/admin", { replace: true });
+      } catch {
+        // Not logged in, stay on login page
+        setLoading(false);
+      }
+    };
+    checkSession();
+  }, [nav]);
+
+  if (loading) return <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 flex items-center justify-center text-slate-300">Loading...</div>;
 
   const submit = async (e) => {
     e.preventDefault();

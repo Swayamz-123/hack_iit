@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerResponder } from "../api/incident.api";
+import { registerResponder, meResponder } from "../api/incident.api";
 import { socket } from "../socket/socket";
 
 export default function WorkerLogin() {
@@ -10,18 +10,29 @@ export default function WorkerLogin() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!navigator.geolocation) {
-      setDetecting(false);
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        setDetecting(false);
-      },
-      () => setDetecting(false)
-    );
-  }, []);
+    // Check if already logged in
+    const checkSession = async () => {
+      try {
+        await meResponder();
+        // If no error, user is logged in
+        navigate("/worker", { replace: true });
+      } catch {
+        // Not logged in, proceed with geolocation
+        if (!navigator.geolocation) {
+          setDetecting(false);
+          return;
+        }
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+            setDetecting(false);
+          },
+          () => setDetecting(false)
+        );
+      }
+    };
+    checkSession();
+  }, [navigate]);
 
   const submit = async (e) => {
     e.preventDefault();
