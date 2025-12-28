@@ -57,9 +57,42 @@ export async function list(req, res)
    res.json({ success: true, data: incidents }); 
   }
    export async function verify(req, res) {
-     const updated = await service.verifyIncident(req.body.incidentId); 
-     emitEvent("incident:update", updated); 
-     res.json({ success: true, data: updated }); 
+     const updated = await service.verifyIncident(req.body.incidentId);
+
+     // Auto-assign responders when verified
+     try {
+       if (updated?.location?.lat && updated?.location?.lng) {
+         const assignTypes = ["police", "ambulance"];
+         if (updated.type === "fire") assignTypes.push("fire");
+
+         // Find nearby responders (<= 10km)
+         const { Responder } = await import("../models/Responder.model.js");
+         const { distanceInMeters } = await import("../utils/geo.js");
+         const responders = await Responder.find({ type: { $in: assignTypes } });
+         const nearby = responders.filter((r) =>
+           distanceInMeters(
+             updated.location.lat,
+             updated.location.lng,
+             r.location.lat,
+             r.location.lng
+           ) <= 10 * 1000
+         );
+
+         if (nearby.length > 0) {
+           updated.assignedTo = Array.from(new Set([...(updated.assignedTo || []), ...nearby.map((r) => r._id)]));
+           await updated.save();
+
+           // Notify responders via socket rooms
+           const { emitToResponder } = await import("../socket/socket.js");
+           nearby.forEach((r) => emitToResponder(r._id.toString(), "assignment:new", updated));
+         }
+       }
+     } catch (e) {
+       console.error("Assignment error:", e.message);
+     }
+
+     emitEvent("incident:update", updated);
+     res.json({ success: true, data: updated });
     }
 export async function updateStatus(req, res) {
   const updated = await service.updateStatus(

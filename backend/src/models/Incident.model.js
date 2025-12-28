@@ -29,6 +29,7 @@ const IncidentSchema = new mongoose.Schema(
 
 
     upvotes: { type: Number, default: 0 },
+    assignedTo: [{ type: mongoose.Schema.Types.ObjectId, ref: "Responder" }],
     media: { type: [String], default: [] },
     internalNotes: String,
   },

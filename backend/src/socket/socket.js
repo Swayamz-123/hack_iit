@@ -10,10 +10,23 @@ export function initSocket(server) {
 
   io.on("connection", (socket) => {
     console.log("🔌 Client connected:", socket.id);
+
+    // Workers join their personal room for targeted assignments
+    socket.on("responder:join", (responderId) => {
+      const room = `responder:${responderId}`;
+      socket.join(room);
+      console.log(`👷 Responder joined room: ${room}`);
+    });
   });
 }
 
 export function emitEvent(event, data) {
   io.emit(event, data);
   console.log(`🔥 Socket emitted: ${event}`);
+}
+
+export function emitToResponder(responderId, event, data) {
+  const room = `responder:${responderId}`;
+  io.to(room).emit(event, data);
+  console.log(`📣 Socket to ${room}: ${event}`);
 }

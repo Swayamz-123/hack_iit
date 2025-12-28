@@ -16,3 +16,9 @@ export const uploadMedia = (file) => {
     headers: { "Content-Type": "multipart/form-data" },
   });
 };
+
+// Responder APIs
+export const registerResponder = (payload) => api.post("/responders/register", payload);
+export const meResponder = () => api.get("/responders/me");
+export const fetchAssignments = () => api.get("/responders/assignments");
+export const logoutResponder = () => api.post("/responders/logout");

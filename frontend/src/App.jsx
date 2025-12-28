@@ -4,6 +4,8 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashBoard";
 import IncidentForm from "./components/IncidentForm";
 import ProtectedRoute from "./components/ProtectedRoute";
+import WorkerLogin from "./pages/WorkerLogin";
+import WorkerDashboard from "./pages/WorkerDashboard";
 
 export default function App() {
   return (
@@ -20,6 +22,8 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/worker/login" element={<WorkerLogin />} />
+        <Route path="/worker" element={<WorkerDashboard />} />
       </Routes>
     </BrowserRouter>
   );
