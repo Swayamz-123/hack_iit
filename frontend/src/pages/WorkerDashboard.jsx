@@ -56,26 +56,33 @@ export default function WorkerDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-indigo-950 text-slate-100">
+    <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-800">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <header className="mb-6 flex items-center justify-between">
+        <header className="mb-8 flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-black bg-linear-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Responder Dashboard</h2>
+            <h2 className="text-3xl font-black bg-linear-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+              Responder Dashboard
+            </h2>
             {me && (
-              <p className="text-xs text-slate-400 mt-2">{me.name} • {me.type}</p>
+              <p className="text-xs text-slate-400 mt-2 font-medium">
+                🚔 {me.name} • {me.type.toUpperCase()}
+              </p>
             )}
           </div>
           <button
             onClick={handleLogout}
-            className="px-3 py-2 rounded-lg text-xs font-bold bg-slate-800/70 text-white border border-slate-600 hover:bg-slate-700"
+            className="px-4 py-2 rounded-lg text-xs font-bold bg-slate-700/80 hover:bg-slate-600/80 text-slate-200 border border-slate-600/50 transition"
           >
             Logout
           </button>
         </header>
         {incidents.length === 0 ? (
-          <div className="rounded-2xl border border-slate-700/70 bg-slate-900/60 p-6 text-center">No assignments yet.</div>
+          <div className="rounded-lg border border-slate-700/50 bg-slate-800/60 p-8 text-center">
+            <p className="text-sm font-semibold text-slate-300">✓ All caught up!</p>
+            <p className="text-xs text-slate-500 mt-2">No new assignments at this time</p>
+          </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {incidents.map((i) => (
               <IncidentCard key={i._id} incident={i} responder onStatusUpdate={handleStatusUpdate} />
             ))}
