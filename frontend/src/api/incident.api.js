@@ -6,6 +6,8 @@ export const verifyIncident = (incidentId) =>
   api.post("/incidents/verify", { incidentId });
 export const updateIncidentStatus = (payload) =>
   api.post("/incidents/status", payload);
+export const upvoteIncident = (incidentId, deviceId) =>
+  api.post("/incidents/upvote", { incidentId, deviceId });
 export const adminLogin = (data) => api.post("/admin/login", data);
 export const checkAdmin = () => api.get("/admin/me");
 export const logoutAdmin = () => api.post("/admin/logout");

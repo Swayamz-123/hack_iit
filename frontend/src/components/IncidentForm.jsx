@@ -18,6 +18,7 @@ export default function IncidentForm() {
   const [mediaFile, setMediaFile] = useState(null);
   const [mediaPreview, setMediaPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -76,9 +77,9 @@ export default function IncidentForm() {
         deviceId: getDeviceId(),
         media: mediaUrls,
       });
-
+      setSuccessMsg("Incident reported successfully! Redirecting to feed...");
       // 🔁 Redirect to feed after success
-      navigate("/");
+      setTimeout(() => navigate("/feed"), 1200);
     } catch (error) {
       alert("Failed to submit incident: " + error.message);
     } finally {
@@ -91,6 +92,11 @@ export default function IncidentForm() {
       onSubmit={submit}
       className="bg-linear-to-br from-slate-900/95 to-indigo-900/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 mb-8 border border-l-4 border-red-500/80 max-w-2xl mx-auto"
     >
+      {successMsg && (
+        <div className="mb-4 rounded-lg border border-emerald-600/40 bg-emerald-900/30 px-4 py-3 text-sm text-emerald-200 font-semibold">
+          {successMsg}
+        </div>
+      )}
       <h3 className="text-2xl font-black capitalize bg-linear-to-r from-red-400 to-orange-400 bg-clip-text text-transparent mb-8 text-center drop-shadow-2xl">
         Report Incident
       </h3>

@@ -8,6 +8,7 @@ router.post("/", ctrl.create);
 router.get("/", ctrl.list);
 router.post("/verify", adminAuth, ctrl.verify);
 router.post("/status", adminAuth, ctrl.updateStatus);
+router.post("/upvote", ctrl.upvote);
 router.post("/upload", upload.single("media"), ctrl.uploadMedia);
 
 export default router;

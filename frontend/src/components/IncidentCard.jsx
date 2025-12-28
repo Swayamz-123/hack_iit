@@ -1,9 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SeverityBadge from "./SeverityBadge";
 import MapPreview from "./MapReview";
+import { getDeviceId } from "../utils/deviceId";
+import { upvoteIncident } from "../api/incident.api";
 
 export default function IncidentCard({ incident, admin, responder, onVerify, onResolve, onSaveNotes, onStatusUpdate }) {
   const [notes, setNotes] = useState(incident.internalNotes || "");
+  const [hasVoted, setHasVoted] = useState(false);
+  const [upvoteLoading, setUpvoteLoading] = useState(false);
+
+  useEffect(() => {
+    const deviceId = getDeviceId();
+    const voted = Array.isArray(incident.voters) && incident.voters.includes(deviceId);
+    setHasVoted(voted);
+  }, [incident]);
+
+  const handleUpvote = async () => {
+    if (hasVoted || upvoteLoading) return;
+    const deviceId = getDeviceId();
+    setUpvoteLoading(true);
+    try {
+      const res = await upvoteIncident(incident._id, deviceId);
+      const updated = res.data?.data;
+      if (updated) {
+        setHasVoted(true);
+      }
+    } catch (e) {
+      console.error("Upvote failed", e);
+    } finally {
+      setUpvoteLoading(false);
+    }
+  };
   return (
     <div className="bg-linear-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-sm rounded-2xl shadow-2xl p-6 mb-6 border  border-l-4 border-red-500/60 hover:shadow-2xl hover:border-slate-600/80 transition-all duration-300">
       {/* Incident Type */}
@@ -54,10 +81,21 @@ export default function IncidentCard({ incident, admin, responder, onVerify, onR
           </span>
         </p>
         <p className="flex items-center gap-2">
-          <span className="font-semibold text-slate-400 min-w-15">Upvotes:</span>
-          <span className="px-3 py-1 bg-emerald-500/20 border border-emerald-500/30 rounded-lg text-xs font-bold text-emerald-300">
-            👍 {incident.upvotes}
-          </span>
+          <span className="font-semibold text-slate-400">Upvotes</span>
+          <div className="flex items-center gap-2">
+            <span className="px-3 py-1 bg-emerald-500/20 border border-emerald-500/30 rounded-lg text-xs font-bold text-emerald-300">
+              👍 {incident.upvotes}
+            </span>
+            {!admin && !responder && (
+              <button
+                onClick={handleUpvote}
+                disabled={hasVoted || upvoteLoading}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-emerald-600 to-teal-700 text-white border border-emerald-500/30 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {hasVoted ? "Voted" : upvoteLoading ? "..." : "Upvote"}
+              </button>
+            )}
+          </div>
         </p>
       </div>
 

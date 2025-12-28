@@ -104,6 +104,34 @@ export async function updateStatus(req, res) {
   res.json({ success: true, data: updated });
 }
 
+export async function upvote(req, res) {
+  const { incidentId, deviceId } = req.body;
+  if (!incidentId || !deviceId) {
+    return res
+      .status(400)
+      .json({ success: false, message: "incidentId and deviceId required" });
+  }
+
+  const incident = await Incident.findById(incidentId);
+  if (!incident) {
+    return res.status(404).json({ success: false, message: "Incident not found" });
+  }
+
+  incident.voters = incident.voters || [];
+  incident.upvotes = incident.upvotes || 0;
+
+  if (incident.voters.includes(deviceId)) {
+    return res.json({ success: true, data: incident, message: "Already upvoted" });
+  }
+
+  incident.voters.push(deviceId);
+  incident.upvotes += 1;
+  await incident.save();
+
+  emitEvent("incident:update", incident);
+  res.json({ success: true, data: incident });
+}
+
 export async function uploadMedia(req, res) {
   try {
     if (!req.file) {
