@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { createIncident, uploadMedia } from "../api/incident.api";
 import MapPreview from "./MapReview";
 import { getDeviceId } from "../utils/deviceId";
-//made changes to trigger redeploy
+import { Upload } from "lucide-react";
+
 export default function IncidentForm() {
   const navigate = useNavigate();
 
@@ -53,17 +54,13 @@ export default function IncidentForm() {
 
   const submit = async (e) => {
     e.preventDefault();
-
     if (!location) {
       alert("Location not available");
       return;
     }
-
     setUploading(true);
     try {
       const mediaUrls = [];
-      
-      // Upload media if present
       if (mediaFile) {
         const uploadRes = await uploadMedia(mediaFile);
         if (uploadRes.data.success) {
@@ -77,130 +74,103 @@ export default function IncidentForm() {
         deviceId: getDeviceId(),
         media: mediaUrls,
       });
-      setSuccessMsg("Incident reported successfully! Redirecting to feed...");
-      // 🔁 Redirect to feed after success
+      setSuccessMsg("Protocol submitted. Syncing to local grid...");
       setTimeout(() => navigate("/feed"), 1200);
     } catch (error) {
-      alert("Failed to submit incident: " + error.message);
+      alert("Failed to submit: " + error.message);
     } finally {
       setUploading(false);
     }
   };
 
   return (
-    <form
-      onSubmit={submit}
-      className="bg-[#C5ABD1] rounded-2xl shadow-2xl p-8 mb-6 border border-[#B89BC5]"
-    >
+    <form onSubmit={submit} className="space-y-6" style={{ fontFamily: '"Inter", "Segoe UI", Roboto, sans-serif' }}>
       {successMsg && (
-        <div className="mb-4 rounded-lg border border-emerald-600/40 bg-emerald-900/30 px-4 py-3 text-xs text-emerald-200 font-semibold">
-          {successMsg}
+        <div className="bg-[#7DA99C]/20 text-[#5A877A] p-4 rounded-2xl text-xs font-bold border border-[#7DA99C]/30">
+          ✓ {successMsg}
         </div>
       )}
-      <h3 className="text-base font-bold capitalize text-[#5a4a6a] mb-6 text-center">
-        Report Incident
-      </h3>
 
-      {/* Incident Type */}
-      <label className="block mb-6">
-        <span className="block text-xs font-bold text-[#5a4a6a] mb-3">
-          Incident Type
-        </span>
-        <select
-          className="w-full px-4 py-2.5 rounded-lg border border-stone-300 bg-[#f5efe9] text-xs font-semibold text-[#5a4a6a] focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 transition"
-          value={form.type}
-          onChange={(e) => setForm({ ...form, type: e.target.value })}
-        >
-          <option value="accident">🚗 Accident</option>
-          <option value="medical">🏥 Medical</option>
-          <option value="fire">🔥 Fire</option>
-          <option value="other">❓ Other</option>
-        </select>
-      </label>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-[11px] font-black text-[#5A5266] uppercase tracking-wider mb-2 ml-2">Category</label>
+          <select
+            className="w-full bg-white/50 border-none rounded-2xl px-5 py-3.5 text-sm font-bold text-[#5A5266] focus:ring-2 focus:ring-[#7DA99C]/40 appearance-none shadow-inner"
+            value={form.type}
+            onChange={(e) => setForm({ ...form, type: e.target.value })}
+          >
+            <option value="accident">Accident</option>
+            <option value="medical">Medical</option>
+            <option value="fire">Fire Alert</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-[11px] font-black text-[#5A5266] uppercase tracking-wider mb-2 ml-2">Priority Level</label>
+          <select
+            className="w-full bg-white/50 border-none rounded-2xl px-5 py-3.5 text-sm font-bold text-[#5A5266] focus:ring-2 focus:ring-[#7DA99C]/40 appearance-none shadow-inner"
+            value={form.severity}
+            onChange={(e) => setForm({ ...form, severity: e.target.value })}
+          >
+            <option value="low">Standard</option>
+            <option value="medium">Urgent</option>
+            <option value="high">Critical</option>
+          </select>
+        </div>
+      </div>
 
-      {/* Description */}
-      <label className="block mb-6">
-        <span className="block text-xs font-bold text-[#5a4a6a] mb-3">
-          Description
-        </span>
+      <div>
+        <label className="block text-[11px] font-black text-[#5A5266] uppercase tracking-wider mb-2 ml-2">Description</label>
         <textarea
-          placeholder="Describe the incident in detail..."
+          placeholder="Detailed situation description..."
           value={form.description}
-          onChange={(e) =>
-            setForm({ ...form, description: e.target.value })
-          }
-          className="w-full rounded-lg border border-stone-300 px-4 py-3 text-xs resize-none bg-[#f5efe9] text-[#5a4a6a] placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 transition"
-          rows={5}
+          onChange={(e) => setForm({ ...form, description: e.target.value })}
+          className="w-full rounded-[1.5rem] border-none px-5 py-4 text-sm bg-white/50 text-[#5A5266] placeholder-[#8E8699]/60 focus:ring-2 focus:ring-[#7DA99C]/40 min-h-[120px] resize-none shadow-inner"
         />
-      </label>
+      </div>
 
-      {/* Severity */}
-      <label className="block mb-6">
-        <span className="block text-xs font-bold text-[#5a4a6a] mb-3">
-          Severity
-        </span>
-        <select
-          className="w-full px-4 py-2.5 rounded-lg border border-stone-300 bg-[#f5efe9] text-xs font-semibold text-[#5a4a6a] focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 transition"
-          value={form.severity}
-          onChange={(e) =>
-            setForm({ ...form, severity: e.target.value })
-          }
-        >
-          <option value="low">🟢 Low</option>
-          <option value="medium">🟡 Medium</option>
-          <option value="high">🔴 High</option>
-        </select>
-      </label>
-
-      {/* Media Upload */}
-      <label className="block mb-6">
-        <span className="block text-xs font-bold text-[#5a4a6a] mb-3">
-          Photo Evidence (Optional)
-        </span>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleMediaChange}
-          className="block w-full text-xs text-[#5a4a6a] file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-teal-500 file:text-white hover:file:bg-teal-600 cursor-pointer bg-[#f5efe9] border border-stone-300 rounded-lg"
-        />
-        {mediaPreview && (
-          <div className="mt-4 rounded-lg overflow-hidden border border-stone-300 shadow-md">
-            <img
-              src={mediaPreview}
-              alt="Preview"
-              className="w-full h-48 object-cover"
-            />
-          </div>
-        )}
-      </label>
-
-      {/* Location */}
-      {loadingLocation && (
-        <div className="mb-6 p-4 bg-[#f5efe9] rounded-lg border border-stone-300 text-center">
-          <p className="text-xs text-[#5a4a6a] font-semibold animate-pulse">
-            📡 Detecting location...
-          </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+            <label className="block text-[11px] font-black text-[#5A5266] uppercase tracking-wider ml-2">Attachments</label>
+            <div className="relative group">
+                <input
+                    type="file"
+                    onChange={handleMediaChange}
+                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                />
+                <div className="bg-white/50 border-2 border-dashed border-[#B8B0B0] rounded-2xl h-32 flex flex-col items-center justify-center transition-all">
+                    {mediaPreview ? (
+                        <img src={mediaPreview} className="h-full w-full object-cover rounded-2xl" />
+                    ) : (
+                        <div className="flex flex-col items-center gap-2">
+                            <Upload size={20} className="text-[#8E8699]" />
+                            <span className="text-[10px] font-black text-[#8E8699] uppercase">Add Photo / File</span>
+                        </div>
+                    )}
+                </div>
+            </div>
         </div>
-      )}
 
-      {location && (
-        <div className="mb-6">
-          <p className="text-xs text-[#5a4a6a] mb-3 font-semibold">
-            📍 <span className="text-[#5a4a6a] font-mono bg-[#f5efe9] px-2.5 py-1 rounded border border-stone-300">{location.lat.toFixed(4)}, {location.lng.toFixed(4)}</span>
-          </p>
-
-          <div className="rounded-lg overflow-hidden border border-stone-300 shadow-lg bg-[#f5efe9]">
-            <MapPreview lat={location.lat} lng={location.lng} />
-          </div>
+        <div className="space-y-2">
+            <label className="block text-[11px] font-black text-[#5A5266] uppercase tracking-wider ml-2">GPS Sync</label>
+            <div className="bg-white/50 rounded-2xl h-32 overflow-hidden border border-black/5 shadow-inner flex items-center justify-center">
+                {loadingLocation ? (
+                    <div className="text-center animate-pulse">
+                        <span className="text-[10px] font-black text-[#7DA99C] uppercase tracking-tighter">Locating...</span>
+                    </div>
+                ) : (
+                    <MapPreview lat={location.lat} lng={location.lng} />
+                )}
+            </div>
         </div>
-      )}
+      </div>
 
       <button
         type="submit"
         disabled={!location || uploading}
-        className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white py-3 rounded-lg font-bold text-xs shadow-lg hover:shadow-xl transform hover:scale-[1.01] transition-all duration-200 active:scale-[0.99] border border-teal-500/30 disabled:from-stone-300 disabled:to-stone-400 disabled:text-stone-500 disabled:shadow-none disabled:cursor-not-allowed disabled:scale-100"
+        className="w-full bg-[#7DA99C] hover:bg-[#6A9488] text-white py-5 rounded-[1.5rem] font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-[#7DA99C]/30 transition-all active:scale-[0.98] disabled:opacity-50"
       >
-        {uploading ? "📤 Uploading..." : "🚨 Report Incident"}
+        {uploading ? "Transmitting..." : "Submit Protocol"}
       </button>
     </form>
   );
