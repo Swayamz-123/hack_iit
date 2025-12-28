@@ -42,9 +42,37 @@ export default function CitizenFeed() {
     };
   }, []);
 
-  const activeIncidents = incidents.filter(
-    (i) => i.status !== "resolved"
-  );
+  const getDistanceInMeters = (incident) => {
+    if (!userLocation || !incident.location) return null;
+    return distanceInMeters(
+      userLocation.lat,
+      userLocation.lng,
+      incident.location.lat,
+      incident.location.lng
+    );
+  };
+
+  const getDistance = (incident) => {
+    const dist = getDistanceInMeters(incident);
+    if (dist === null) return null;
+    if (dist < 1000) return `${Math.round(dist)} m`;
+    return `${(dist / 1000).toFixed(1)} km`;
+  };
+
+  const canUpvote = (incident) => {
+    if (!userLocation) return false;
+    const dist = getDistanceInMeters(incident);
+    return dist !== null && dist <= 2000; // 2km = 2000m
+  };
+
+  const activeIncidents = incidents.filter((i) => {
+    if (i.status === "resolved") return false;
+    // If no location, show all incidents
+    if (!userLocation) return true;
+    // If location available, filter by 15km radius
+    const dist = getDistanceInMeters(i);
+    return dist !== null && dist <= 15000; // 15km = 15000m
+  });
 
   const handleUpvote = async (incidentId, deviceId) => {
     try {
@@ -53,18 +81,6 @@ export default function CitizenFeed() {
     } catch (e) {
       console.error("Upvote failed", e);
     }
-  };
-
-  const getDistance = (incident) => {
-    if (!userLocation || !incident.location) return null;
-    const dist = distanceInMeters(
-      userLocation.lat,
-      userLocation.lng,
-      incident.location.lat,
-      incident.location.lng
-    );
-    if (dist < 1000) return `${Math.round(dist)} m`;
-    return `${(dist / 1000).toFixed(1)} km`;
   };
 
   const getTimeAgo = (date) => {
@@ -119,7 +135,15 @@ export default function CitizenFeed() {
           <div className="lg:col-span-5 bg-white/40 rounded-[2.5rem] p-6 md:p-8 backdrop-blur-sm border border-white/60">
             <div className="mb-6">
               <h3 className="text-2xl font-bold text-[#423D47] mb-1 tracking-tight">Local Incidents & Verification</h3>
-              <p className="text-sm text-[#8E8699] font-medium italic">Recent activity within 1km radius</p>
+              <p className="text-sm text-[#8E8699] font-medium italic">
+                {userLocation ? "Recent activity within 15km radius" : "All incidents (location not enabled)"}
+              </p>
+              {userLocation && (
+                <p className="text-xs text-[#7DA99C] mt-2 font-bold">✓ Location enabled • Upvotes available within 2km</p>
+              )}
+              {!userLocation && (
+                <p className="text-xs text-[#B08991] mt-2 font-bold">⚠ Enable location to upvote incidents</p>
+              )}
             </div>
 
             <div className="mb-8 relative">
@@ -172,16 +196,21 @@ export default function CitizenFeed() {
                           
                           <div className="flex gap-2">
                             <button
-                              onClick={() => !hasVoted && handleUpvote(incident._id, deviceId)}
-                              disabled={hasVoted}
+                              onClick={() => !hasVoted && canUpvote(incident) && handleUpvote(incident._id, deviceId)}
+                              disabled={hasVoted || !canUpvote(incident)}
+                              title={!canUpvote(incident) ? "Upvotes only available within 2km" : ""}
                               className={`flex-1 flex items-center justify-center gap-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
-                                hasVoted ? 'bg-[#7DA99C]/20 text-[#7DA99C]' : 'bg-[#EDE7E1] text-[#423D47]'
+                                hasVoted ? 'bg-[#7DA99C]/20 text-[#7DA99C]' : 
+                                !canUpvote(incident) ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50' :
+                                'bg-[#EDE7E1] text-[#423D47]'
                               }`}
                             >
                               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 15l7-7 7 7" />
                               </svg>
-                              {hasVoted ? `✓ Voted (${incident.upvotes})` : `👍 Upvote (${incident.upvotes})`}
+                              {hasVoted ? `✓ Voted (${incident.upvotes})` : 
+                               !canUpvote(incident) ? `📍 Too far (${incident.upvotes})` :
+                               `👍 Upvote (${incident.upvotes})`}
                             </button>
                             <button 
                               onClick={() => setSelectedIncident(incident)}
