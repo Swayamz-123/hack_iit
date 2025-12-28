@@ -5,7 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { distanceInMeters } from "../utils/geo";
 import AdminControls from "../components/AdminControls";
 import MapProvider from "../components/MapProvider";
-import { Activity, LogOut, MapPin, Layers, X, CheckCircle, Image as ImageIcon } from "lucide-react";
+import Logo from "../components/Logo";
+import { LogOut, MapPin, Layers, X, CheckCircle, Image as ImageIcon } from "lucide-react";
 
 export default function AdminDashboard() {
   const [incidents, setIncidents] = useState([]);
@@ -139,7 +140,7 @@ export default function AdminDashboard() {
       <div className="max-w-400 mx-auto p-4 md:p-8">
         <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[#D9D1D1] pb-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-[#7DA99C] rounded-2xl flex items-center justify-center text-white shadow-sm font-black italic">E</div>
+            <Logo />
             <div>
               <h1 className="text-2xl font-black uppercase tracking-tighter leading-none">Em-Grid</h1>
               <p className="text-[10px] font-bold text-[#8E8699] uppercase tracking-[0.2em] mt-1">Admin Dashboard</p>

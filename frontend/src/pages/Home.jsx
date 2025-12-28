@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import Logo from "../components/Logo";
 
 export default function Home() {
   const nav = useNavigate();
@@ -40,9 +41,7 @@ export default function Home() {
           <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-[#7DA99C] rounded-2xl flex items-center justify-center shadow-sm">
-                   <div className="w-5 h-5 border-2 border-white rounded-sm rotate-45"></div>
-                </div>
+                <Logo />
                 <span className="text-[#5A5266] font-black text-2xl tracking-tighter uppercase">Em-Grid</span>
               </div>
               <h1 className="text-4xl md:text-6xl font-black text-[#4A4453] tracking-[ -0.04em] leading-none">

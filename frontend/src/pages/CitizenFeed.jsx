@@ -6,7 +6,7 @@ import IncidentForm from "../components/IncidentForm";
 import MapPreview from "../components/MapReview";
 import { getDeviceId } from "../utils/deviceId";
 import { distanceInMeters } from "../utils/geo";
-import { Activity } from "lucide-react";
+import Logo from "../components/Logo";
 
 export default function CitizenFeed() {
   const [incidents, setIncidents] = useState([]);
@@ -102,9 +102,7 @@ export default function CitizenFeed() {
         
         {/* Simplified Branding Header */}
         <header className="mb-12 flex items-center gap-4 border-b border-[#D9D1D1] pb-8">
-          <div className="w-12 h-12 bg-[#7DA99C] rounded-2xl flex items-center justify-center text-white shadow-sm">
-            <Activity size={28} />
-          </div>
+          <Logo />
           <div>
             <h1 className="text-2xl font-black uppercase tracking-tighter leading-none">Em-Grid</h1>
             <p className="text-[10px] font-bold text-[#8E8699] uppercase tracking-[0.2em] mt-1">Emergency Protocol System</p>

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchAssignments, meResponder, logoutResponder, updateIncidentStatusResponder } from "../api/incident.api";
 import IncidentCard from "../components/IncidentCard";
 import MapPreview from "../components/MapReview";
+import Logo from "../components/Logo";
 import { socket } from "../socket/socket";
 
 export default function WorkerDashboard() {
@@ -64,9 +65,7 @@ export default function WorkerDashboard() {
           <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-[#7DA99C] rounded-2xl flex items-center justify-center shadow-sm">
-                  <div className="w-5 h-5 border-2 border-white rounded-sm rotate-45"></div>
-                </div>
+                <Logo />
                 <span className="text-[#5A5266] font-black text-2xl tracking-tighter uppercase">Em-Grid</span>
               </div>
               <h1 className="text-3xl md:text-4xl font-black text-[#4A4453] tracking-[ -0.02em] leading-none">
