@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchAssignments, meResponder, logoutResponder } from "../api/incident.api";
+import { fetchAssignments, meResponder, logoutResponder, updateIncidentStatusResponder } from "../api/incident.api";
 import IncidentCard from "../components/IncidentCard";
 import { socket } from "../socket/socket";
 
@@ -37,6 +37,15 @@ export default function WorkerDashboard() {
     return () => socket.off("assignment:new");
   }, []);
 
+  const handleStatusUpdate = async (incidentId, status) => {
+    try {
+      await updateIncidentStatusResponder(incidentId, status);
+      load(); // Reload assignments
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to update status");
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await logoutResponder();
@@ -68,7 +77,7 @@ export default function WorkerDashboard() {
         ) : (
           <div className="space-y-4">
             {incidents.map((i) => (
-              <IncidentCard key={i._id} incident={i} />
+              <IncidentCard key={i._id} incident={i} responder onStatusUpdate={handleStatusUpdate} />
             ))}
           </div>
         )}

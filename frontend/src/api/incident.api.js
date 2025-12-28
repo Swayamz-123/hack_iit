@@ -21,4 +21,5 @@ export const uploadMedia = (file) => {
 export const registerResponder = (payload) => api.post("/responders/register", payload);
 export const meResponder = () => api.get("/responders/me");
 export const fetchAssignments = () => api.get("/responders/assignments");
+export const updateIncidentStatusResponder = (incidentId, status) => api.post("/incidents/status", { incidentId, status });
 export const logoutResponder = () => api.post("/responders/logout");

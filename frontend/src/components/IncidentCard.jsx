@@ -2,7 +2,7 @@ import { useState } from "react";
 import SeverityBadge from "./SeverityBadge";
 import MapPreview from "./MapReview";
 
-export default function IncidentCard({ incident, admin, onVerify, onResolve, onSaveNotes }) {
+export default function IncidentCard({ incident, admin, responder, onVerify, onResolve, onSaveNotes, onStatusUpdate }) {
   const [notes, setNotes] = useState(incident.internalNotes || "");
   return (
     <div className="bg-linear-to-br from-slate-900/95 to-indigo-900/95 backdrop-blur-sm rounded-2xl shadow-2xl p-6 mb-6 border border-white/20 border-l-4 border-red-500/80 hover:shadow-3xl hover:-translate-y-1 transition-all duration-300">
@@ -115,6 +115,26 @@ export default function IncidentCard({ incident, admin, onVerify, onResolve, onS
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Display Admin Notes for Responders */}
+      {responder && incident?.internalNotes && (
+        <div className="mt-4 bg-yellow-900/30 border border-yellow-600/50 rounded-lg px-4 py-3">
+          <p className="text-xs font-semibold text-yellow-400 mb-1">Admin Instructions:</p>
+          <p className="text-sm text-slate-200">{incident.internalNotes}</p>
+        </div>
+      )}
+
+      {/* Responder Mark Resolved Button */}
+      {responder && incident.status === "verified" && (
+        <div className="flex gap-3 mt-6 pt-6 border-t border-white/10">
+          <button
+            onClick={() => onStatusUpdate?.(incident._id, "resolved")}
+            className="px-6 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 active:scale-[0.98] border border-emerald-400/30 backdrop-blur-sm"
+          >
+            ✓ Mark as Resolved
+          </button>
         </div>
       )}
     </div>
