@@ -21,32 +21,52 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      <div className="max-w-5xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-slate-100">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Page Header */}
-        <h2 className="text-2xl font-bold text-slate-800 mb-6">
-          Admin Dashboard
-        </h2>
+        <header className="mb-8 flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-3xl font-black bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent drop-shadow-xl">
+              Admin Dashboard
+            </h2>
+            <p className="mt-2 text-sm text-slate-300">
+              Monitor, verify, and resolve real‑time incident reports.
+            </p>
+          </div>
+          <div className="px-4 py-2 rounded-full bg-slate-900/60 border border-slate-700/70 text-xs font-semibold uppercase tracking-wide">
+            Incidents:{" "}
+            <span className="ml-1 text-emerald-400">
+              {incidents.length}
+            </span>
+          </div>
+        </header>
 
         {/* Empty State */}
         {incidents.length === 0 && (
-          <p className="text-slate-500 text-sm">
-            No incidents reported yet.
-          </p>
+          <div className="mt-12 rounded-2xl border border-dashed border-slate-700/70 bg-slate-900/60 px-6 py-10 text-center">
+            <p className="text-sm font-medium text-slate-300">
+              No incidents reported yet.
+            </p>
+            <p className="mt-2 text-xs text-slate-500">
+              New incidents will appear here in real time as they are reported.
+            </p>
+          </div>
         )}
 
         {/* Incident List */}
-        <div className="space-y-4">
-          {incidents.map((i) => (
-            <IncidentCard
-              key={i._id}
-              incident={i}
-              admin
-              onVerify={verify}
-              onResolve={resolve}
-            />
-          ))}
-        </div>
+        {incidents.length > 0 && (
+          <div className="space-y-4">
+            {incidents.map((i) => (
+              <IncidentCard
+                key={i._id}
+                incident={i}
+                admin
+                onVerify={verify}
+                onResolve={resolve}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

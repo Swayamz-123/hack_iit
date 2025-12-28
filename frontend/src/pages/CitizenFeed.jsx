@@ -28,20 +28,23 @@ export default function CitizenFeed() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      <div className="max-w-5xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-slate-100">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-slate-800">
-            Live Incident Feed
-          </h2>
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+          <div>
+            <h2 className="text-3xl font-black bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-xl">
+              Live Incident Feed
+            </h2>
+            <p className="mt-2 text-sm text-slate-300">
+              Real‑time updates of active incidents reported by citizens.
+            </p>
+          </div>
 
           {/* 🚨 Emergency Button */}
           <button
             onClick={() => navigate("/report")}
-            className="bg-red-600 text-white px-5 py-2
-                       rounded-full font-semibold
-                       hover:bg-red-700 transition"
+            className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-2.5 rounded-full font-semibold text-sm shadow-xl hover:from-red-600 hover:to-orange-600 hover:shadow-2xl transition-transform duration-200 active:scale-[0.98]"
           >
             🚨 Report Emergency
           </button>
@@ -49,17 +52,24 @@ export default function CitizenFeed() {
 
         {/* Empty State */}
         {activeIncidents.length === 0 && (
-          <p className="text-sm text-slate-500">
-            No active incidents reported.
-          </p>
+          <div className="mt-10 rounded-2xl border border-dashed border-slate-700/70 bg-slate-900/60 px-6 py-10 text-center">
+            <p className="text-sm font-medium text-slate-300">
+              No active incidents reported.
+            </p>
+            <p className="mt-2 text-xs text-slate-500">
+              New incidents will appear here instantly as they are raised.
+            </p>
+          </div>
         )}
 
         {/* Feed */}
-        <div className="space-y-4">
-          {activeIncidents.map((i) => (
-            <IncidentCard key={i._id} incident={i} />
-          ))}
-        </div>
+        {activeIncidents.length > 0 && (
+          <div className="space-y-4">
+            {activeIncidents.map((i) => (
+              <IncidentCard key={i._id} incident={i} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
