@@ -5,11 +5,12 @@ import { useNavigate } from "react-router-dom";
 import IncidentForm from "../components/IncidentForm";
 import { getDeviceId } from "../utils/deviceId";
 import { distanceInMeters } from "../utils/geo";
-import { Activity } from "lucide-react";
+import { Activity, X, Info } from "lucide-react"; // Added Info and X icons
 
 export default function CitizenFeed() {
   const [incidents, setIncidents] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
+  const [selectedIncident, setSelectedIncident] = useState(null); // New state for Details
   const navigate = useNavigate();
 
   const load = async () => {
@@ -24,12 +25,7 @@ export default function CitizenFeed() {
     
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setUserLocation({
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-          });
-        },
+        (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
         () => {}
       );
     }
@@ -40,49 +36,77 @@ export default function CitizenFeed() {
     };
   }, []);
 
-  const activeIncidents = incidents.filter(
-    (i) => i.status !== "resolved"
-  );
+  const activeIncidents = incidents.filter((i) => i.status !== "resolved");
 
   const handleUpvote = async (incidentId, deviceId) => {
     try {
       await upvoteIncident(incidentId, deviceId);
       load();
-    } catch (e) {
-      console.error("Upvote failed", e);
-    }
+    } catch (e) { console.error("Upvote failed", e); }
   };
 
   const getDistance = (incident) => {
     if (!userLocation || !incident.location) return null;
-    const dist = distanceInMeters(
-      userLocation.lat,
-      userLocation.lng,
-      incident.location.lat,
-      incident.location.lng
-    );
-    if (dist < 1000) return `${Math.round(dist)} m`;
-    return `${(dist / 1000).toFixed(1)} km`;
+    const dist = distanceInMeters(userLocation.lat, userLocation.lng, incident.location.lat, incident.location.lng);
+    return dist < 1000 ? `${Math.round(dist)} m` : `${(dist / 1000).toFixed(1)} km`;
   };
 
   const getTimeAgo = (date) => {
     if (!date) return "";
-    const now = new Date();
-    const incidentDate = new Date(date);
-    const diffMs = now - incidentDate;
-    const diffMins = Math.floor(diffMs / 60000);
+    const diffMins = Math.floor((new Date() - new Date(date)) / 60000);
     if (diffMins < 60) return `${diffMins} min`;
     const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours} hr`;
-    const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays} day`;
+    return diffHours < 24 ? `${diffHours} hr` : `${Math.floor(diffHours / 24)} day`;
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F1EB] font-sans text-[#423D47]" style={{ fontFamily: '"Inter", "Segoe UI", Roboto, sans-serif' }}>
+    <div className="min-h-screen bg-[#F5F1EB] font-sans text-[#423D47] relative" style={{ fontFamily: '"Inter", "Segoe UI", Roboto, sans-serif' }}>
+      
+      {/* Detail Overlay (Modal) */}
+      {selectedIncident && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-2xl font-black uppercase tracking-tight text-[#423D47]">
+                    {selectedIncident.type} Report
+                  </h3>
+                  <p className="text-xs font-bold text-[#8E8699] uppercase tracking-widest mt-1">Incident ID: {selectedIncident._id.slice(-6)}</p>
+                </div>
+                <button onClick={() => setSelectedIncident(null)} className="p-2 bg-[#F5F1EB] rounded-full hover:bg-[#D9D1D1] transition-colors">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="bg-[#F5F1EB] rounded-3xl p-6 text-sm leading-relaxed text-[#5A5266] border border-black/5">
+                <span className="font-black text-[10px] uppercase block mb-2 opacity-50 tracking-widest">Description</span>
+                {selectedIncident.description}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-[#D9D1D1] p-4 rounded-2xl">
+                  <span className="font-black text-[9px] uppercase block mb-1 opacity-60">Distance</span>
+                  <p className="font-bold">{getDistance(selectedIncident) || "N/A"}</p>
+                </div>
+                <div className="bg-[#D9D1D1] p-4 rounded-2xl">
+                  <span className="font-black text-[9px] uppercase block mb-1 opacity-60">Reported</span>
+                  <p className="font-bold">{getTimeAgo(selectedIncident.createdAt)} ago</p>
+                </div>
+              </div>
+
+              <button 
+                onClick={() => setSelectedIncident(null)}
+                className="w-full bg-[#423D47] text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest"
+              >
+                Close Details
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto p-4 md:p-10">
-        
-        {/* Simplified Branding Header */}
         <header className="mb-12 flex items-center gap-4 border-b border-[#D9D1D1] pb-8">
           <div className="w-12 h-12 bg-[#7DA99C] rounded-2xl flex items-center justify-center text-white shadow-sm">
             <Activity size={28} />
@@ -94,15 +118,13 @@ export default function CitizenFeed() {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Left Column - 60% */}
           <div className="lg:col-span-7 space-y-6">
             <div className="bg-[#D9D1D1] rounded-[2.5rem] p-8 shadow-sm border border-black/5">
               <h2 className="text-xl font-bold text-[#5A5266] mb-6 tracking-tight">Report an Incident</h2>
               <IncidentForm />
             </div>
 
-            <div className="bg-[#E7E0E0] rounded-[2rem] p-6 border border-white/20">
+            <div className="bg-[#E7E0E0] rounded-4xl p-6 border border-white/20">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-[#423D47] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">!</div>
                 <h3 className="font-bold text-[#423D47]">Recent Alerts</h3>
@@ -113,7 +135,6 @@ export default function CitizenFeed() {
             </div>
           </div>
 
-          {/* Right Column - 40% */}
           <div className="lg:col-span-5 bg-white/40 rounded-[2.5rem] p-6 md:p-8 backdrop-blur-sm border border-white/60">
             <div className="mb-6">
               <h3 className="text-2xl font-bold text-[#423D47] mb-1 tracking-tight">Local Incidents & Verification</h3>
@@ -143,7 +164,7 @@ export default function CitizenFeed() {
                   return (
                     <div key={incident._id} className="bg-white rounded-3xl p-5 shadow-sm border border-black/5">
                       <div className="flex gap-4">
-                        <div className="w-20 h-20 bg-[#F5F1EB] rounded-2xl flex-shrink-0 overflow-hidden flex items-center justify-center border border-black/5">
+                        <div className="w-20 h-20 bg-[#F5F1EB] rounded-2xl shrink-0 overflow-hidden flex items-center justify-center border border-black/5">
                           {incident.media?.[0] ? (
                             <img src={incident.media[0]} alt="Incident" className="w-full h-full object-cover" />
                           ) : (
@@ -175,7 +196,11 @@ export default function CitizenFeed() {
                               </svg>
                               {hasVoted ? 'Verified' : 'Upvote'}
                             </button>
-                            <button className="bg-[#423D47] text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider">
+                            {/* Updated Details Button to trigger setSelectedIncident */}
+                            <button 
+                              onClick={() => setSelectedIncident(incident)}
+                              className="bg-[#423D47] text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider"
+                            >
                               Details
                             </button>
                           </div>
